@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}My Bookings{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>My upcoming bookings</h2>
+    {% if bookings %}
+        <table>
+            <tr><th>Resource</th><th>Date</th><th>Time</th><th></th></tr>
+            {% for b in bookings %}
+            <tr>
+                <td>{{ b.resource_name }}</td>
+                <td>{{ b.booking_date }}</td>
+                <td>{{ '%02d' % b.slot_hour }}:00 - {{ '%02d' % (b.slot_hour + 1) }}:00</td>
+                <td>
+                    <form method="post" action="{{ url_for('cancel_booking', booking_id=b.id) }}">
+                        <button type="submit" class="danger">Cancel</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>You have no upcoming bookings. Go to the home page to book a slot.</p>
+    {% endif %}
+</div>
+{% endblock %}

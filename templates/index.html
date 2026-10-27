@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Book a Slot{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>Find a slot</h2>
+    <form method="get" action="{{ url_for('index') }}">
+        <label>Resource</label>
+        <select name="resource_id">
+            {% for r in resources %}
+                <option value="{{ r.id }}" {% if r.id == selected_resource_id %}selected{% endif %}>{{ r.name }}</option>
+            {% endfor %}
+        </select>
+        <label>Date</label>
+        <input type="date" name="date" value="{{ selected_date }}" min="{{ today }}" max="{{ max_date }}">
+        <button type="submit">Show slots</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2>{{ selected_resource_name }} on {{ selected_date }}</h2>
+    <div class="slot-grid">
+        {% for s in slots %}
+            {% if s.status == 'free' %}
+                <div class="slot free">
+                    <form method="post" action="{{ url_for('book') }}">
+                        <input type="hidden" name="resource_id" value="{{ selected_resource_id }}">
+                        <input type="hidden" name="date" value="{{ selected_date }}">
+                        <input type="hidden" name="hour" value="{{ s.hour }}">
+                        {{ s.label }}
+                        <button type="submit">Book</button>
+                    </form>
+                </div>
+            {% elif s.status == 'mine' %}
+                <div class="slot taken">{{ s.label }} (your booking)</div>
+            {% elif s.status == 'past' %}
+                <div class="slot taken">{{ s.label }} (past)</div>
+            {% else %}
+                <div class="slot taken">{{ s.label }} (booked)</div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
