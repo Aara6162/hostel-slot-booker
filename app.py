@@ -293,9 +293,58 @@ def cancel_booking(booking_id):
 @login_required
 @admin_required
 def admin():
-    return "Admin page (coming soon)"
+    db = get_db()
+    resources = db.execute("SELECT * FROM resources ORDER BY name").fetchall()
+    today = str(now_ist().date())
+    bookings = db.execute(
+        """SELECT b.id, b.booking_date, b.slot_hour,
+                  r.name AS resource_name, u.username
+           FROM bookings b
+           JOIN resources r ON r.id = b.resource_id
+           JOIN users u ON u.id = b.user_id
+           WHERE b.booking_date >= ?
+           ORDER BY b.booking_date, b.slot_hour""",
+        (today,),
+    ).fetchall()
+    return render_template("admin.html", resources=resources, bookings=bookings)
+
+
+@app.route("/admin/resources", methods=["POST"])
+@login_required
+@admin_required
+def admin_add_resource():
+    name = request.form.get("name", "").strip()
+    if not name or len(name) > 50:
+        flash("Resource name must be 1 to 50 characters.", "error")
+        return redirect(url_for("admin"))
+
+    db = get_db()
+    try:
+        db.execute("INSERT INTO resources (name) VALUES (?)", (name,))
+        db.commit()
+    except sqlite3.IntegrityError:
+        flash("A resource with that name already exists.", "error")
+        return redirect(url_for("admin"))
+
+    flash(f"Added resource: {name}", "success")
+    return redirect(url_for("admin"))
+
+
+@app.route("/admin/cancel/<int:booking_id>", methods=["POST"])
+@login_required
+@admin_required
+def admin_cancel(booking_id):
+    db = get_db()
+    booking = db.execute("SELECT id FROM bookings WHERE id = ?", (booking_id,)).fetchone()
+    if booking is None:
+        flash("Booking not found.", "error")
+        return redirect(url_for("admin"))
+
+    db.execute("DELETE FROM bookings WHERE id = ?", (booking_id,))
+    db.commit()
+    flash("Booking cancelled by admin.", "success")
+    return redirect(url_for("admin"))
 
 
 if __name__ == "__main__":
     app.run(debug=True)
-    
