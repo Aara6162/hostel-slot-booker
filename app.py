@@ -346,5 +346,20 @@ def admin_cancel(booking_id):
     return redirect(url_for("admin"))
 
 
+@app.errorhandler(404)
+def not_found(error):
+    return render_template(
+        "error.html", code=404, title="Page not found",
+        message="The page you are looking for does not exist.",
+    ), 404
+
+
+@app.errorhandler(500)
+def server_error(error):
+    return render_template(
+        "error.html", code=500, title="Something went wrong",
+        message="An unexpected error occurred. Please try again.",
+    ), 500
+
 if __name__ == "__main__":
     app.run(debug=True)
