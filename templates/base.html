@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hostel Slot Booker{% endblock %}</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f4f6f8; color: #222; }
+        nav { display: flex; gap: 16px; align-items: center; padding: 12px 0; border-bottom: 2px solid #ddd; margin-bottom: 20px; }
+        nav a { text-decoration: none; color: #1a56db; font-weight: bold; }
+        nav .spacer { flex: 1; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-bottom: 16px; }
+        input, select { padding: 8px; margin: 6px 0 12px 0; width: 100%; box-sizing: border-box; }
+        button { padding: 8px 16px; background: #1a56db; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button.danger { background: #c81e1e; }
+        .flash { padding: 10px; border-radius: 4px; margin-bottom: 12px; }
+        .flash.error { background: #fde8e8; color: #9b1c1c; }
+        .flash.success { background: #def7ec; color: #03543f; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 8px; border-bottom: 1px solid #eee; }
+        .slot-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+        .slot { padding: 10px 14px; border-radius: 4px; font-size: 14px; }
+        .slot.free { background: #def7ec; }
+        .slot.taken { background: #e5e7eb; color: #888; }
+        .slot form { margin: 0; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('index') }}">Hostel Slot Booker</a>
+        <span class="spacer"></span>
+        {% if session.get('user_id') %}
+            <a href="{{ url_for('my_bookings') }}">My Bookings</a>
+            {% if session.get('role') == 'admin' %}
+                <a href="{{ url_for('admin') }}">Admin</a>
+            {% endif %}
+            <span>{{ session.get('username') }}</span>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Register</a>
+        {% endif %}
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</body>
+</html>

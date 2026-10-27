@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>Create an account</h2>
+    <form method="post">
+        <label>Username</label>
+        <input type="text" name="username" required minlength="3" maxlength="30">
+        <label>Password (minimum 6 characters)</label>
+        <input type="password" name="password" required minlength="6">
+        <button type="submit">Register</button>
+    </form>
+</div>
+{% endblock %}
